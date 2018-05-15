@@ -1,0 +1,63 @@
+01_ext_spp_from_snib.R
+
+# Aim: to identify the introduced species inside Areas Naturales Protegidas de Mexico
+# Objetivo: identificar las especies introducidas dentro de las Areas Naturales Protegidas de Mexico
+
+02_sel_spp.R
+
+# Aim: to select the introduced species that will be used
+# Objetivo: seleccionar las especies introducidas que seran usadas
+
+03_down_occ.R
+
+# Aim: to download species ocurrences of the selected species from several repositories
+# Objetivo: Descargar registros de presencia de las especies seleccionadas desde diferentes repositorios
+
+	attached scripts/ scripts anexos:  03_f1_get.species.obs.R 
+					   03_f2_get.species.data.R
+
+04_resamplehfp.R
+
+# Aim: to resample and reprojecting human footprint index created by 
+# Venter et al 2016, from 0.5 arcmin to 5 arcmin resolution and moll 
+# project to planar projection
+# Objetivo: remuestrear y reproyectar el indice de huella humana creado
+# por Venter et al 2016, de una resolución de 0.5 minutos de arco a 
+# 5 minutos de arco, y de una proyección de moll a planar.
+
+05_cleaning_data.R
+
+# Aim: to merge and clean occurence data of selected species that were downloaded
+# Objetivo: unir y limpiar los datos de registros de presencia de las especies seleccionadas que fueron descargados
+	
+	attached scripts/ scripts anexos:  05_f1_err.geo.R 
+					   05_f2_plots.R
+					   05_f3_env.outliers.R	
+					   
+06_M
+
+# Aim: to construct M or study area through gbuffer function at several
+# distances from occurrences (100, 200 , 400, 500 km)
+# Objetivo: construir la M o area de estudio a traves de la función
+# gbuffer a diversas distacias de los registros de presencia
+
+	attached scripts/ scripts anexos:  06_f1_Mextent.R
+
+07_env_pca.R
+
+# Aim: to load bioclimatical variables from worldclim and apply an 
+# ordination method (pca) to 
+# reduce dimensionality, correlation and improve model prediction, the pca will be aplicated in precipitation and temperature data inside the accesible area only
+# Objetivo: decidir la apropiada resolución del estudio, descargar variables bioclimaticas # de worldclim y aplicar un metodo de ordenacion para reducir la dimensionalidad, # correlación y mejorar la prediccion del modelo, el pca sera realizado en los datos de # precipitación y temperatura dentro del area accesible unicamente
+	
+	attached scripts/ scripts anexos:  07_f1_pcaM.R
+
+08_split_data.R
+
+# Aim:
+# Objetivo:
+	attached scripts/ scripts anexos:  08_f1_split.R
+					   08_f2_envSample (Sara Varela, 								   https://github.com/SaraVarela/envSample)	
+
+
+			
