@@ -8,13 +8,17 @@ compile <- function(path.enmeval = "output/09_mod_clim/",
   a <- dir(path = path.enmeval, pattern = sp, full.names = T)
   m <- rep(list(1), length(a))
   n <- rep(list(1), length(a))
+  r <- rep(list(1), length(a))
+  
   for (i in 1:length(a))
   {
     m[[i]] <- list.files(a[i], pattern = pattern.enmeval, full.names = T)
     n[[i]] <- read.csv(m[[i]])
+    r[[i]] <- n[[i]][order(n[[i]][,"settings"]),]
   }
-  o <- rbindlist(n)
 
+  o <- rbindlist(r)
+  
   b <- dir(path = path.proc.bin, pattern = sp, full.names = T)
   c <- b[grep(pattern.proy, b)]
 
