@@ -7,8 +7,10 @@ source("R/10_f1_pROC.R")
 source("R/10_f2_evalbin.R")
 source("R/10_f3_evalALL.R")
 source("R/10_f4_compile.R")
-source("R/10_f5_select.R")
+source("R/10_f5_sel.R")
 source("R/10_f6_domess.R")
+source("R/10_f7_selclim_plushum.R")
+
 
 # enlistar las carpetas donde se encuentran los modelos
 spmo_list <- list.dirs("output/09_mod_climhum",
@@ -21,7 +23,7 @@ occ_list <- list.dirs("output/08_datasplit",
   recursive = F
 )
 
-# crear una carpeta para la evaluación de los modelos climaticos
+# crear una carpeta para la evaluaci?n de los modelos climaticos
 # y climaticos-humanos
 dir.create("output/10_eval_clim")
 dir.create("output/10_eval_climhum")
@@ -48,13 +50,13 @@ spp <- as.character(read.csv("output/02_sel_spp_inv.csv")[, "sp"])
 for (i in 1:length(spp)) {
   compile(
     sp = spp[i],
-    path.enmeval = "output/09_mod_clim/",
-    path.proc.bin = "output/10_eval_clim/",
+    path.enmeval = "output/09_mod_climhum/",
+    path.proc.bin = "output/10_eval_climhum/",
     pattern.enmeval = "_ENMeval.csv",
     pattern.cal = "cal_eval.csv",
     pattern.proy = "kmeval.csv",
     path.write = "output/10_eval_all/", write = T,
-    type = "clim"
+    type = "climhum"
   )
 }
 
@@ -97,3 +99,16 @@ for (i in 1:length(folder_occ)) {
     type = "climhum"
   )
 }
+
+spp <- as.character(read.csv("output/02_sel_spp_inv.csv")[, "sp"])
+search_ <- rep(list(1), length(spp))
+for (i in 1:length(spp)) {
+  search_[[i]] <- search_clim_plushum(
+    sp = spp[i],
+    clim = "output/10_modsel_clim.csv",
+    eval = "output/10_eval_all/",
+    pattern.mix = "_climhum"
+  )
+}
+search_ <- rbindlist(search_)
+write.csv(search_, "output/11_modsel_clim_plushum.csv", row.names = F)
