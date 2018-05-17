@@ -7,7 +7,9 @@ model.ENMeval <- function(folder_occ,
                           pattern_prec,
                           pattern_tem,
                           long_lat,
-                          rm, dir_write,
+                          rm, 
+                          fclass = c("L", "LQ", "H", "LQH", "LQHP", "LQHPT"),
+                          dir_write,
                           onlyclim,
                           pattern_factor) {
   sp <- substr(folder_occ, 1, nchar(folder_occ) - 2)
@@ -72,7 +74,7 @@ model.ENMeval <- function(folder_occ,
     occ = occ_train[, long_lat], env = env_cal,
     bg.coords = occ_bg[, long_lat],
     occ.grp = occ_train$bin, bg.grp = occ_bg$bin, method = "user",
-    RMvalues = rm, overlap = F,
+    RMvalues = rm, fc = fclass, overlap = F,
     clamp = F, bin.output = F, rasterPreds = T
   )
 
@@ -81,15 +83,18 @@ model.ENMeval <- function(folder_occ,
   dir.create(paste0(dir_write, folder_occ))
   dir_write2 <- paste0(dir_write, folder_occ, "/")
 
+  # predecir los modelos logisticos en las areas de calibracion
+  cal_log <- lapply(mod@models, function(x) predict(x, env_cal))
+  
+  # predecir los modelos logisticos en las areas de proyeccion
+  proy_log <- lapply(mod@models, function(x) predict(x, env_proy))
+  
   # escribir los resultados de la evaluacion de ENMeval
   write.csv(mod@results, file = paste0(
     dir_write2,
     folder_occ, "_ENMeval.csv"
   ), row.names = F)
-
-  # predecir los modelos logisticos en las areas de calibracion
-  cal_log <- lapply(mod@models, function(x) predict(x, env_cal))
-
+  
   # escribir los modelos logisticos
   for (i in 1:nrow(mod@results))
   {
@@ -104,10 +109,7 @@ model.ENMeval <- function(folder_occ,
     )
   }
 
-  # predecir los modelos logisticos en las areas de proyeccion
-  proy_log <- lapply(mod@models, function(x) predict(x, env_proy))
-
-  # escribir los modelos logisticos de las areas de proyeccion
+    # escribir los modelos logisticos de las areas de proyeccion
   for (i in 1:nrow(mod@results))
   {
     writeRaster(proy_log[[i]], file.path(paste0(
@@ -146,7 +148,6 @@ model.ENMeval <- function(folder_occ,
       row.names = F
     )
   }
-
   rm(list = ls())
   gc()
 }
