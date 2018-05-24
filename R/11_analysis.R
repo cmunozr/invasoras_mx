@@ -10,7 +10,6 @@ library(colorRamps)
 source("R/11_f1_compmet.R")
 source("R/11_f2_compidon.R")
 source("R/11_f3_compmaps.R")
-source("R/11_f4_heatmap.R")
 
 # mejores modelos climaticos
 clim <- "output/10_modsel_clim.csv"
@@ -26,11 +25,13 @@ col_compare <- c(
 # b - a
 # c - a
 
-dir.create("output/11_performance")
-dir.create("output/11_similarity")
-dir.create("output/11_mapcompare")
+dir.create("output/11_comp_performance")
+dir.create("output/11_comp_idon")
+dir.create("output/11_comp_map")
 dir.create("output/11_heatmap")
 
-lapply(col_compare, function(x) metric_comp(compare = x))
-idon_comp(path.a = clim, path.b = climhum, path.c = clim_plushum)
+lapply(col_compare, function(x) metric_comp(compare = x,
+       path.perf = "output/11_comp_performance/"))
+idon_comp(path.a = clim, path.b = climhum, path.c = clim_plushum,
+          path.sim = "output/11_comp_idon")
 map_comp(path.a = clim, path.b = climhum, path.c = clim_plushum)
