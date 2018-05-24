@@ -1,7 +1,7 @@
 # similitud
 # idon vs freq
 
-idon_comp <- function(path.a = clim,
+comp_idon <- function(path.a = clim,
                       path.b = climhum,
                       path.c = clim_plushum,
                       mod.proy = "ModelFile_proy",
@@ -18,6 +18,9 @@ idon_comp <- function(path.a = clim,
   b <- read.csv(path.b)
   c <- read.csv(path.c)
 
+  dir.create("figs/11_comp_idon", showWarnings = F) 
+  dir.write <- "figs/11_comp_idon/"
+  
   objects_ <- list(a, b, c)
   objects_results <- rep(list(1), length(objects_))
   for (i in 1:length(objects_))
@@ -114,7 +117,7 @@ idon_comp <- function(path.a = clim,
     plot5 <- plot5 + geom_errorbar(limits, width = 0.025, position = position_dodge(width = 0.9))
     plot5 <- plot5 + geom_hline(yintercept = 0)
 
-    pdf(paste0(path.fig, "11_similarity", "_", as.character(mod$sp[i]), ".pdf"))
+    pdf(paste0(dir.write, "11_", as.character(mod$sp[i]), "_comp_idon.pdf"))
     grid.arrange(
       arrangeGrob(plot1, ncol = 1),
       arrangeGrob(plot2, plot4, plot3, plot5, ncol = 2, nrow = 2)
@@ -167,20 +170,20 @@ idon_comp <- function(path.a = clim,
   write.csv(summ_1pooled, paste0(path.sim, name.c, "_", name.a, "all_spp.csv"), row.names = F)
 
   limits <- aes(ymax = summ_1pooled$mean + summ_1pooled$std_error, ymin = summ_1pooled$mean - summ_1pooled$std_error)
-  plot6 <- ggplot(summ_1pooled, aes(V2, mean)) + xlim(0, 1.05) + ylim(-0.5, 0.8)
+  plot6 <- ggplot(summ_1pooled, aes(V2, mean)) + xlim(0, 1.05) + ylim(-0.5, 0.5)
   plot6 <- plot6 + xlab("Idoneidad") + ylab(paste0("Diferencia (modelo ", name.b, " - ", name.a))
   plot6 <- plot6 + geom_bar(stat = "identity", position = position_dodge())
   plot6 <- plot6 + geom_errorbar(limits, width = 0.025, position = position_dodge(width = 0.9))
   plot6 <- plot6 + geom_hline(yintercept = 0)
 
   limits <- aes(ymax = summ_2pooled$mean + summ_2pooled$std_error, ymin = summ_2pooled$mean - summ_2pooled$std_error)
-  plot7 <- ggplot(summ_2pooled, aes(V2, mean)) + xlim(0, 1.05) + ylim(-0.5, 0.8)
+  plot7 <- ggplot(summ_2pooled, aes(V2, mean)) + xlim(0, 1.05) + ylim(-0.5, 0.5)
   plot7 <- plot7 + xlab("Idoneidad") + ylab(paste0("Diferencia (modelo ", name.c, " - ", name.a))
   plot7 <- plot7 + geom_bar(stat = "identity", position = position_dodge())
   plot7 <- plot7 + geom_errorbar(limits, width = 0.025, position = position_dodge(width = 0.9))
   plot7 <- plot7 + geom_hline(yintercept = 0)
 
-  pdf(paste0(path.fig, "11_similarity", "_", "allspp", ".pdf"))
+  pdf(paste0(dir.write, "11_", "allspp", "_comp_idon.pdf"))
   grid.arrange(
     arrangeGrob(plot6, plot7, ncol = 2)
   )

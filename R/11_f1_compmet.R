@@ -31,25 +31,30 @@ metric_comp <- function(path.a = clim,
     "diff_2"
   )
   write.csv(df, paste0(path.perf, "comp_met_", compare, ".csv"))
+  
+  dir.create("figs/11_comp_met", showWarnings = F) 
+  dir.write <-"figs//11_comp_met/"
 
-  pdf(paste0(path.fig, "11_comp_met_", compare, ".pdf"))
+  pdf(paste0(dir.write, compare, "_comp_met_", ".pdf"))
   par(mfrow = c(3, 2), oma = c(0, 0, 2, 0))
   barplot(a_extract,
-    ylab = paste(expression(Delta), compare),
+    ylab = paste(compare),
     names.arg = seq(1, length(a_extract), by = 1)
   )
   plot.new()
   barplot(b_extract,
-    ylab = paste(expression(Delta), compare),
+    ylab = paste(compare),
     names.arg = seq(1, length(a_extract), by = 1)
   )
-  plot(diff_1, type = "l", ylab = "", xlab = "")
+  plot(diff_1, type = "l", ylab = paste(expression(Delta), compare),
+       xlab = "", main = paste0(name.b, " - ", name.a))
   abline(h = 0)
   barplot(c_extract,
-    ylab = paste(expression(Delta), compare),
+    ylab = compare,
     names.arg = seq(1, length(a_extract), by = 1), xlab = "sp"
   )
-  plot(diff_2, type = "l", ylab = "", xlab = "sp")
+  plot(diff_2, type = "l", ylab = paste(expression(Delta), compare),
+       xlab = "sp", main = paste0(name.c, " - ", name.a))
   abline(h = 0)
   dev.off()
 }
