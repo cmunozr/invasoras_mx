@@ -1,3 +1,5 @@
+library(SpatialPack)
+library(FSA)
 library(raster)
 library(rowr)
 library(data.table)
@@ -10,6 +12,7 @@ library(colorRamps)
 source("R/11_f1_compmet.R")
 source("R/11_f2_compidon.R")
 source("R/11_f3_compmaps.R")
+source("R/11_f4_heatmap.R")
 
 # mejores modelos climaticos
 clim <- "output/10_modsel_clim.csv"
@@ -30,8 +33,19 @@ dir.create("output/11_comp_idon")
 dir.create("output/11_comp_map")
 dir.create("output/11_heatmap")
 
-lapply(col_compare, function(x) metric_comp(compare = x,
+list_ <- lapply(col_compare, function(x) metric_comp(compare = x,
        path.perf = "output/11_comp_performance/"))
-idon_comp(path.a = clim, path.b = climhum, path.c = clim_plushum,
-          path.sim = "output/11_comp_idon")
-map_comp(path.a = clim, path.b = climhum, path.c = clim_plushum)
+df_test <- rbindlist(list_)
+write.csv(df_test, "output/11_comp_performance/comp_test.csv",
+          row.names = F)
+
+comp_idon(path.a = clim, path.b = climhum, path.c = clim_plushum,
+          path.sim = "output/11_comp_idon/")
+list_2 <- map_comp(path.a = clim, path.b = climhum, path.c = clim_plushum,
+         path.maps = "output/11_comp_map/" 
+        )
+cor_df <- rbindlist(list_2)
+write.csv(cor_df, "output/11_comp_map/allsp_comp_map.csv",
+          row.names = F)
+heatmap(path.a = clim, path.b = climhum, path.c = clim_plushum,
+        path.heat = "output/11_heatmap/")
