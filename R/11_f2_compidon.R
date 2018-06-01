@@ -7,13 +7,14 @@ comp_idon <- function(path.a = clim,
                       mod.proy = "ModelFile_proy",
                       mod.cal = "ModelFile_cal",
                       path.fig = "figs/",
-                      path.sim = "output/11_similarity/",
+                      path.sim = "output/11_comp_idon/",
                       name.a = "clim",
                       name.b = "climhum",
                       name.c = "clim_plushum",
                       path.occ = "output/08_datasplit/",
                       pattern.train = "train.csv",
-                      pattern.test = "test.csv") {
+                      pattern.test = "test.csv",
+                      pattern.hfp = "human.tif") {
   a <- read.csv(path.a)
   b <- read.csv(path.b)
   c <- read.csv(path.c)
@@ -23,6 +24,7 @@ comp_idon <- function(path.a = clim,
   
   objects_ <- list(a, b, c)
   objects_results <- rep(list(1), length(objects_))
+  objects_results2 <- rep(list(1), length(objects_))
   for (i in 1:length(objects_))
   {
     mod <- objects_[[i]][, c(mod.proy, mod.cal)]
@@ -46,7 +48,14 @@ comp_idon <- function(path.a = clim,
       pattern = pattern.test,
       full.names = T
     )
+    path.humancal <- list.files(paste0("output/07_env_vars/", namekm,
+      "/"), pattern = pattern.hfp,
+      full.names = T
+    )
+    path.humanmx <- "output/07_mexconto4mgw/human.tif"
+    
     extract_ <- rep(list(1), length(path.train))
+    extract_hfp <- rep(list(1), length(path.train))
     for (j in 1:length(path.train))
     {
       train_df <- read.csv(path.train[j])[, 2:3]
@@ -55,10 +64,17 @@ comp_idon <- function(path.a = clim,
       test_df <- read.csv(path.test[j])[, 2:3]
       test_raster <- raster(as.character(mod[, mod.proy][j]))
       test_extract <- extract(test_raster, test_df)
+      hfpmx <- raster(path.humanmx)
+      hfpmx_extract <- extract(hfpmx, test_df)
+      hfpcal <- raster(path.humancal[j])
+      hfpcal_extract <- extract(hfpcal, train_df)
       extract_[[j]] <- c(test_extract, train_extract)
+      extract_hfp[[j]] <- c(hfpcal_extract, hfpmx_extract)
     }
     objects_results[[i]] <- extract_
+    objects_results2[[i]] <- extract_hfp
   }
+  
   summ_1 <- rep(list(1), length(path.train))
   summ_2 <- rep(list(1), length(path.train))
   for (i in 1:length(path.train))
@@ -66,6 +82,8 @@ comp_idon <- function(path.a = clim,
     aex <- objects_results[[1]][[i]]
     bex <- objects_results[[2]][[i]]
     cex <- objects_results[[3]][[i]]
+    hfp <- objects_results2[[1]][[i]]
+    
     aexdf <- data.frame(aex)
     bexdf <- data.frame(bex)
     cexdf <- data.frame(cex)
@@ -123,16 +141,16 @@ comp_idon <- function(path.a = clim,
       arrangeGrob(plot2, plot4, plot3, plot5, ncol = 2, nrow = 2)
     )
     dev.off()
-    df <- cbind.fill(aex, bex, diff_1b, aex, cex, diff_1c)
+    df <- cbind.fill(aex, bex, diff_1b, cex, diff_1c, hfp)
     colnames(df) <- c(
       paste0("idon_", name.a),
       paste0("idon_", name.b),
-      "idon_diff",
-      paste0("idon_", name.a),
+      "idon_diff1",
       paste0("idon_", name.c),
-      "idon_diff"
+      "idon_diff2", "hfp"
     )
-    write.csv(df, paste0(path.sim, "idon_comp_", as.character(mod$sp[i]), ".csv"), row.names = F)
+    
+    write.csv(df, paste0(path.sim, "idon_comp_", as.character(mod$sp[1]), ".csv"), row.names = F)
     write.csv(summarised_df1, paste0(path.sim, "idon_comp_", as.character(mod$sp[i]), "_", name.b, "_", name.a, ".csv"), row.names = F)
     write.csv(summarised_df2, paste0(path.sim, "idon_comp_", as.character(mod$sp[i]), "_", name.c, "_", name.a, ".csv"), row.names = F)
   }
@@ -183,7 +201,7 @@ comp_idon <- function(path.a = clim,
   plot7 <- plot7 + geom_errorbar(limits, width = 0.025, position = position_dodge(width = 0.9))
   plot7 <- plot7 + geom_hline(yintercept = 0)
 
-  pdf(paste0(dir.write, "11_", "allspp", "_comp_idon.pdf"))
+  pdf(paste0(dir.write, "11_", "allspp", "_comp_idon.pdf"), height = 4)
   grid.arrange(
     arrangeGrob(plot6, plot7, ncol = 2)
   )
