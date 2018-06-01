@@ -30,34 +30,27 @@ selection <- function(sp, path.eval="output/10_eval_all/",
   area_cal <- (eval[, "TTP_area_cal"] - (min(eval[, "TTP_area_cal"]))) / (min(eval[, "TTP_area_cal"] - max(eval[, "TTP_area_cal"]))) * -1
   # extraer proc y estandarizarla de 0 (mas grande) a 1 (mas bajos) (entre mas grande mejor)
   proc_cal <- ((max(eval[, "pROC_mean_cal"])) - eval[, "pROC_mean_cal"]) / (max(eval[, "pROC_mean_cal"] - min(eval[, "pROC_mean_cal"])))
-  # calcular la distancia euclidiana de cada metrica al 0 y sumarla
-  dist_cal <- (area_cal * 0.2) + (AICc_ * 0.3) + (OR_cal * 0.2) + (proc_cal * 0.3)
-  n_models <- nrow(eval) * 0.20
-  lim <- sort(dist_cal)[n_models]
-  i <- which(dist_cal <= lim)
-
-  best_cal <- eval[i, ]
-
+  
   # Mejores en areas de proyeccion
 
   # extraer la tasa de omision TTP y estandarizarlo de 0 a 1 (entre mas pequeÃ±o mejor)
-  OR_ <- (best_cal[, "TTP_OR_proy"] - (min(best_cal[, "TTP_OR_proy"]))) / (max(best_cal[, "TTP_OR_proy"] - min(best_cal[, "TTP_OR_proy"])))
+  OR_ <- (eval[, "TTP_OR_proy"] - (min(eval[, "TTP_OR_proy"]))) / (max(eval[, "TTP_OR_proy"] - min(eval[, "TTP_OR_proy"])))
   # extraer el area predicha y estandarizarla de 0 (mas grande) a 1(mas pequeÃ±o) (entre mas pequeÃ±o mejor)
-  area_ <- (best_cal[, "TTP_area_proy"] - (min(best_cal[, "TTP_area_proy"]))) / (min(best_cal[, "TTP_area_proy"] - max(best_cal[, "TTP_area_proy"]))) * -1
+  area_ <- (eval[, "TTP_area_proy"] - (min(eval[, "TTP_area_proy"]))) / (min(eval[, "TTP_area_proy"] - max(eval[, "TTP_area_proy"]))) * -1
   # extraer proc y estandarizarla de 0 (mas grande) a 1 (mas bajos) (entre mas grande mejor)
-  proc_ <- ((max(best_cal[, "pRoc_proy"])) - best_cal[, "pRoc_proy"]) / (max(best_cal[, "pRoc_proy"] - min(best_cal[, "pRoc_proy"])))
+  proc_ <- ((max(eval[, "pRoc_proy"])) - eval[, "pRoc_proy"]) / (max(eval[, "pRoc_proy"] - min(eval[, "pRoc_proy"])))
 
   # calcular la distancia euclidiana de cada metrica al 0 y sumarla
   if (all(is.nan(OR_))) {
-    dist <- (area_ * 0.4) + (proc_ * 0.6)
+    dist <- (AICc_ * 0.5) + (proc_ * 0.5)
   } else {
-  dist <- (area_ * 0.2) + (OR_ * 0.4) + (proc_ * 0.4)
+    dist <- (OR_ * 0.4) + (AICc_ * 0.3) + (proc_ * 0.3)
   }
-
+  
   # mejores modelos (minima distancia sumada)
   minimo <- which(dist == min(dist))
 
-  best_x <- best_cal[minimo, ]
+  best_x <- eval[minimo, ]
 
   # generar grafica de dispersion 3d (en el eje x [ancho] AICc,
   # en el eje y [profundo] tasa de omision, en el z [alto] el area
@@ -68,7 +61,8 @@ selection <- function(sp, path.eval="output/10_eval_all/",
     s3d <- scatterplot3d(
       x = AICc_, y = OR_,
       z = proc_, pch = 16, grid = TRUE, box = FALSE,
-      type = "h", xlab = "AICc", ylab = "OR", zlab = "ROCp"
+      type = "h", xlab = "AICc", ylab = "OR_cal", zlab = "ROCp_cal",
+      color="gray52", main = "Espacio metrico de los modelos"
     )
   }
   return(best_x)
