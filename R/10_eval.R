@@ -3,6 +3,8 @@ library(sqldf)
 library(data.table)
 library(doSNOW)
 library(foreach)
+library(dismo)
+library(scatterplot3d)
 source("R/10_f1_pROC.R")
 source("R/10_f2_evalbin.R")
 source("R/10_f3_evalALL.R")
@@ -22,6 +24,10 @@ occ_list <- list.dirs("output/08_datasplit",
   full.names = T,
   recursive = F
 )
+
+# vector de especies que actua como index para varios loop de las
+# funciones con el fin de automatizar el proceso
+spp <- as.character(read.csv("output/02_sel_spp_inv.csv")[, "sp"])
 
 # crear una carpeta para la evaluaci?n de los modelos climaticos
 # y climaticos-humanos
@@ -62,10 +68,9 @@ for (i in 1:length(spp)) {
 
 # elegir el mejor modelo, a criterio del investigador
 #             cal     proy
-# rocparcial  0.3     0.4
+# rocparcial  NULL     0.3
 # AICc        0.3     NULL   
-# OR_         0.2     0.4
-# Area_       0.2     0.2
+# OR_         NULL     0.4
 
 selection_ <- rep(list(1), length(spp))
 for (i in 1:length(spp)) {
@@ -77,6 +82,21 @@ for (i in 1:length(spp)) {
 }
 selection_ <- rbindlist(selection_)
 write.csv(selection_, "output/10_modsel_clim.csv", row.names = F)
+
+#Buscar el mejor climatico que se le agrega la hfp
+
+search_ <- rep(list(1), length(spp))
+for (i in 1:length(spp)) {
+  search_[[i]] <- search_clim_plushum(
+    sp = spp[i],
+    clim = "output/10_modsel_clim.csv",
+    eval = "output/10_eval_all/",
+    pattern.mix = "_climhum"
+  )
+}
+search_ <- rbindlist(search_)
+write.csv(search_, "output/10_modsel_clim_plushum.csv", row.names = F)
+
 
 # hacer analisis mess para todos los modelos
 folder_occ <- list.dirs("output/08_datasplit/",
@@ -100,15 +120,3 @@ for (i in 1:length(folder_occ)) {
   )
 }
 
-spp <- as.character(read.csv("output/02_sel_spp_inv.csv")[, "sp"])
-search_ <- rep(list(1), length(spp))
-for (i in 1:length(spp)) {
-  search_[[i]] <- search_clim_plushum(
-    sp = spp[i],
-    clim = "output/10_modsel_clim.csv",
-    eval = "output/10_eval_all/",
-    pattern.mix = "_climhum"
-  )
-}
-search_ <- rbindlist(search_)
-write.csv(search_, "output/10_modsel_clim_plushum.csv", row.names = F)
