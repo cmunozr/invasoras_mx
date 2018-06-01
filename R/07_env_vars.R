@@ -45,7 +45,7 @@ dir.create("output/07_env_vars")
 
 # generar un pca para las variables ambientales en cada area accesible
 # o M, se imprimen los componentes con eigenvalue mayores a 1 
-# (allcomp = F)
+# (allcomp = F) y se borrar el area que ocupa México
 
 lapply(dir_shp_vector, function(x) env.M(
     dir_shp = x,
