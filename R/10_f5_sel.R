@@ -18,7 +18,7 @@
 library(data.table)
 
 selection <- function(sp, path.eval="output/10_eval_all/",
-                      graf=F, pattern.type) {
+                      pattern.type) {
   eval <- read.csv(file = paste0(path.eval, sp, pattern.type))
   eval <- na.omit(eval)
   # Mejores en areas de calibraci?n
@@ -59,7 +59,7 @@ selection <- function(sp, path.eval="output/10_eval_all/",
   eval_9 <- eval_8[index_pbin_OR_proy, ]
   
   index_best <- which(min(eval_9[, "TTP_area_proy"])== eval_9[, "TTP_area_proy"])
-  best <- eval_9[index_best, ]
+  best <- eval_9[index_best, ][1, ]
   
   return(best)
 }

@@ -5,6 +5,7 @@ library(doSNOW)
 library(foreach)
 library(dismo)
 library(scatterplot3d)
+
 source("R/10_f1_pROC.R")
 source("R/10_f2_evalbin.R")
 source("R/10_f3_evalALL.R")
@@ -77,11 +78,12 @@ for (i in 1:length(spp)) {
   selection_[[i]] <- selection(
     sp = spp[i],
     path.eval = "output/10_eval_all/",
-    graf = F, pattern.type = "_clim.csv"
+    pattern.type = "_climhum.csv"
   )
 }
 selection_ <- rbindlist(selection_)
-write.csv(selection_, "output/10_modsel_clim.csv", row.names = F)
+selection_ <- na.omit(selection_)
+write.csv(selection_, "output/10_modsel_climhum.csv", row.names = F)
 
 #Buscar el mejor climatico que se le agrega la hfp
 

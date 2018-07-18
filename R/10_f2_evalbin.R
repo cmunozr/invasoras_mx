@@ -1,7 +1,7 @@
 # 25 de julio de 2017
 
 Eval_bin <- function(path.thresholds = NA, Test_Occur = NA, Model = NA) {
-  # Calcula metricas dependientes de umbral segÃfÆ'Ã,Âºn el parametro E definido
+  # Calcula metricas dependientes de umbral seg?f?'?,Âºn el parametro E definido
   # siendo este la cantidad de error que pretendemos aceptar en un modelo.
   # Args:
   #   MTP: threshold of minimun training presence
