@@ -96,7 +96,7 @@ for (i in 1:length(spp)) {
     pattern.mix = "_climhum"
   )
 }
-search_ <- rbindlist(search_)
+search_ <- rbindlist(search_, fill = T)
 write.csv(search_, "output/10_modsel_clim_plushum.csv", row.names = F)
 
 
