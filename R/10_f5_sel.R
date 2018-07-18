@@ -22,48 +22,44 @@ selection <- function(sp, path.eval="output/10_eval_all/",
   eval <- read.csv(file = paste0(path.eval, sp, pattern.type))
   eval <- na.omit(eval)
   # Mejores en areas de calibraci?n
-  # extraer el AICc y estandarizarlo de 0 a 1 (entre mas pequeÃ±o mejor)
-  AICc_ <- (eval[, "AICc"] - (min(eval[, "AICc"]))) / (max(eval[, "AICc"]) - min(eval[, "AICc"]))
-  # extraer la tasa de omision TTP y estandarizarlo de 0 a 1 (entre mas pequeÃ±o mejor)
-  OR_cal <- (eval[, "TTP_OR_cal"] - (min(eval[, "TTP_OR_cal"]))) / (max(eval[, "TTP_OR_cal"] - min(eval[, "TTP_OR_cal"])))
-  # extraer el area predicha y estandarizarla de 0 (mas grande) a 1(mas pequeÃ±o) (entre mas pequeÃ±o mejor)
-  area_cal <- (eval[, "TTP_area_cal"] - (min(eval[, "TTP_area_cal"]))) / (min(eval[, "TTP_area_cal"] - max(eval[, "TTP_area_cal"]))) * -1
-  # extraer proc y estandarizarla de 0 (mas grande) a 1 (mas bajos) (entre mas grande mejor)
-  proc_cal <- ((max(eval[, "pROC_mean_cal"])) - eval[, "pROC_mean_cal"]) / (max(eval[, "pROC_mean_cal"] - min(eval[, "pROC_mean_cal"])))
+  proc_cal <- eval[, "pROC_mean_cal"]
+  index_proc <- which(proc_cal > 1)
+  eval_1 <- eval[index_proc, ] 
   
-  # Mejores en areas de proyeccion
-
-  # extraer la tasa de omision TTP y estandarizarlo de 0 a 1 (entre mas pequeÃ±o mejor)
-  OR_ <- (eval[, "TTP_OR_proy"] - (min(eval[, "TTP_OR_proy"]))) / (max(eval[, "TTP_OR_proy"] - min(eval[, "TTP_OR_proy"])))
-  # extraer el area predicha y estandarizarla de 0 (mas grande) a 1(mas pequeÃ±o) (entre mas pequeÃ±o mejor)
-  area_ <- (eval[, "TTP_area_proy"] - (min(eval[, "TTP_area_proy"]))) / (min(eval[, "TTP_area_proy"] - max(eval[, "TTP_area_proy"]))) * -1
-  # extraer proc y estandarizarla de 0 (mas grande) a 1 (mas bajos) (entre mas grande mejor)
-  proc_ <- ((max(eval[, "pRoc_proy"])) - eval[, "pRoc_proy"]) / (max(eval[, "pRoc_proy"] - min(eval[, "pRoc_proy"])))
-
-  # calcular la distancia euclidiana de cada metrica al 0 y sumarla
-  if (all(is.nan(OR_))) {
-    dist <- (AICc_ * 0.5) + (proc_ * 0.5)
-  } else {
-    dist <- (OR_ * 0.4) + (AICc_ * 0.3) + (proc_ * 0.3)
-  }
+  p_proc_cal <- eval_1[, "p_valor_mean_cal"]
+  index_p_proc <- which(p_proc_cal <= 0.05)
+  eval_2 <- eval_1[index_p_proc, ]
   
-  # mejores modelos (minima distancia sumada)
-  minimo <- which(dist == min(dist))
-
-  best_x <- eval[minimo, ]
-
-  # generar grafica de dispersion 3d (en el eje x [ancho] AICc,
-  # en el eje y [profundo] tasa de omision, en el z [alto] el area
-  # predicha)
-  if (isTRUE(graf)) {
-    library("scatterplot3d")
-    windows()
-    s3d <- scatterplot3d(
-      x = AICc_, y = OR_,
-      z = proc_, pch = 16, grid = TRUE, box = FALSE,
-      type = "h", xlab = "AICc", ylab = "OR_cal", zlab = "ROCp_cal",
-      color="gray52", main = "Espacio metrico de los modelos"
-    )
-  }
-  return(best_x)
+  OR_cal <- eval_2[, "TTP_OR_cal"]
+  index_OR_cal <- which(OR_cal <= 0.10)
+  eval_3 <- eval_2[index_OR_cal, ]
+  
+  pbin_OR_cal <- 1-(eval_3[, "TTP_bin_cal"])
+  index_pbin_OR_cal <- which(pbin_OR_cal <= 0.05)
+  eval_4 <- eval_3[index_pbin_OR_cal, ]
+  
+  AICc_15 <- summary(eval[, "AICc"])[2]
+  index_aicc <- which(eval_4[, "AICc"] < AICc_15)
+  eval_5 <- eval_4[index_aicc, ]
+  
+  proc_proy <- eval_5[, "pRoc_proy"]
+  index_proc_proy <- which(proc_proy > 1)
+  eval_6 <- eval_5[index_proc_proy, ] 
+  
+  p_proc_proy <- eval_6[, "p_valor_proy"]
+  index_p_proc_proy <- which(p_proc_proy <= 0.05)
+  eval_7 <- eval_6[index_p_proc_proy, ]
+  
+  OR_proy <- eval_7[, "TTP_OR_proy"]
+  index_OR_proy <- which(OR_proy <= 0.10)
+  eval_8 <- eval_7[index_OR_proy, ]
+  
+  pbin_OR_proy <- 1-(eval_8[, "TTP_bin_proy"])
+  index_pbin_OR_proy <- which(pbin_OR_proy <= 0.05)
+  eval_9 <- eval_8[index_pbin_OR_proy, ]
+  
+  index_best <- which(min(eval_9[, "TTP_area_proy"])== eval_9[, "TTP_area_proy"])
+  best <- eval_9[index_best, ]
+  
+  return(best)
 }
