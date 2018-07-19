@@ -9,23 +9,47 @@ heatmap <- function(path.a = clim,
                      path.mx = "data/geo_shp/mex_4km_shp/conto4mgw.shp",
                      name.a = "clim",
                      name.b = "climhum",
-                     name.c = "clim_plushum") {
+                     name.c = "clim_plushum",
+                     spp_model = comp) {
+  comm_sp <- as.character(comp[which(!is.na(spp_model[, "comp"])), "Especie"])
+  
   a <- read.csv(path.a)
-  b <- read.csv(path.b)
-  c <- read.csv(path.c)
-
-  conditions <- function(x=a) {
-    index <- c(
-      which(x[, "pRoc_proy"] < 1.01),
-      which(x["p_valor_proy"] > 0.05),
-      which(x["TTP_OR_proy"] > 0.10)
-    )
-    data <- x[-index, ]
+  
+  i <- seq(1,nrow(a), by = 1)
+  for(j in 1:nrow(a)) {
+    if (length(grep(comm_sp[j], a$ModelFile_proy)) != 0) 
+    {i[j] <- (comm_sp[j])}else{i[j] <- NA}
   }
+  a <- a[!is.na(i),]
+  
+  b <- read.csv(path.b)
+  i2 <- seq(1,nrow(b), by = 1)
+  for(j in 1:nrow(b)) {
+    if (length(grep(comm_sp[j], b$ModelFile_proy)) != 0) 
+    {i2[j] <- (comm_sp[j])}else{i2[j] <- NA}
+  }
+  b <- b[!is.na(i2), ]
+  
+  c <- read.csv(path.c)
+  i3 <- seq(1,nrow(c), by = 1)
+  for(j in 1:nrow(c)) {
+    if (length(grep(comm_sp[j], c$ModelFile_proy)) != 0) 
+    {i3[j] <- (comm_sp[j])}else{i3[j] <- NA}
+  }
+  c <- c[!is.na(i3), ]
+  
+  #conditions <- function(x=a) {
+  #  index <- c(
+  #    which(x[, "pRoc_proy"] < 1.01),
+  #    which(x["p_valor_proy"] > 0.05),
+  #    which(x["TTP_OR_proy"] > 0.10)
+  #  )
+  #  data <- x[-index, ]
+  #}
 
-  a <- conditions(a)
-  b <- conditions(b)
-  c <- conditions(c)
+  #a <- conditions(a)
+  #b <- conditions(b)
+  #c <- conditions(c)
 
   objects_ <- list(a, b, c)
   objects_bin <- rep(list(1), length(objects_))
