@@ -10,10 +10,36 @@ map_comp <- function(path.a = clim,
                      name.a = "clim",
                      name.b = "climhum",
                      name.c = "clim_plushum",
-                     path.mx = "data/geo_shp/mex_4km_shp/conto4mgw.shp") {
+                     path.mx = "data/geo_shp/mex_4km_shp/conto4mgw.shp",
+                     spp_model = comp) {
+  
+  comm_sp <- as.character(comp[which(!is.na(spp_model[, "comp"])), "Especie"])
+  
   a <- read.csv(path.a)
+  
+  i <- seq(1,nrow(a), by = 1)
+  for(j in 1:nrow(a)) {
+    if (length(grep(comm_sp[j], a$ModelFile_proy)) != 0) 
+    {i[j] <- (comm_sp[j])}else{i[j] <- NA}
+  }
+  a <- a[!is.na(i),]
+  
   b <- read.csv(path.b)
+  i2 <- seq(1,nrow(b), by = 1)
+  for(j in 1:nrow(b)) {
+    if (length(grep(comm_sp[j], b$ModelFile_proy)) != 0) 
+    {i2[j] <- (comm_sp[j])}else{i2[j] <- NA}
+  }
+  b <- b[!is.na(i2), ]
+  
   c <- read.csv(path.c)
+  i3 <- seq(1,nrow(c), by = 1)
+  for(j in 1:nrow(c)) {
+    if (length(grep(comm_sp[j], c$ModelFile_proy)) != 0) 
+    {i3[j] <- (comm_sp[j])}else{i3[j] <- NA}
+  }
+  c <- c[!is.na(i3), ]
+  
   shp.mx <- shapefile(path.mx)
   dir.create(paste0(path.fig, "11_comp_map"), showWarnings = F)
   dir.write <- paste0(path.fig, "/11_comp_map/")

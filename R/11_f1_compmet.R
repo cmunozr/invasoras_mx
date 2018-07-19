@@ -5,16 +5,41 @@
 metric_comp <- function(path.a = clim,
                         path.b = climhum,
                         path.c = clim_plushum,
+                        spp_model = comp,
                         compare,
                         path.fig = "figs/",
                         path.perf = "output/11_comp_performance/",
                         name.a = "clim",
                         name.b = "climhum",
-                        name.c = "clim_plushum") {
+                        name.c = "clim_plushum",
+                        spp) {
+  comm_sp <- as.character(comp[which(!is.na(spp_model[, "comp"])), "Especie"])
+  
   a <- read.csv(path.a)
-  b <- read.csv(path.b)
-  c <- read.csv(path.c)
+  
+  i <- seq(1,nrow(a), by = 1)
+  for(j in 1:nrow(a)) {
+    if (length(grep(comm_sp[j], a$ModelFile_proy)) != 0) 
+    {i[j] <- (comm_sp[j])}else{i[j] <- NA}
+  }
+  a <- a[!is.na(i),]
 
+  b <- read.csv(path.b)
+  i2 <- seq(1,nrow(b), by = 1)
+  for(j in 1:nrow(b)) {
+    if (length(grep(comm_sp[j], b$ModelFile_proy)) != 0) 
+    {i2[j] <- (comm_sp[j])}else{i2[j] <- NA}
+  }
+  b <- b[!is.na(i2), ]
+  
+  c <- read.csv(path.c)
+  i3 <- seq(1,nrow(c), by = 1)
+  for(j in 1:nrow(c)) {
+    if (length(grep(comm_sp[j], c$ModelFile_proy)) != 0) 
+    {i3[j] <- (comm_sp[j])}else{i3[j] <- NA}
+  }
+  c <- c[!is.na(i3), ]
+  
   # performance
   a_extract <- a[, compare]
   b_extract <- b[, compare]

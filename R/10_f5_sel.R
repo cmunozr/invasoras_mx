@@ -38,28 +38,28 @@ selection <- function(sp, path.eval="output/10_eval_all/",
   index_pbin_OR_cal <- which(pbin_OR_cal <= 0.05)
   eval_4 <- eval_3[index_pbin_OR_cal, ]
   
-  AICc_15 <- summary(eval[, "AICc"])[2]
-  index_aicc <- which(eval_4[, "AICc"] < AICc_15)
-  eval_5 <- eval_4[index_aicc, ]
+  #AICc_15 <- quantile(eval_4[, "AICc"], 0.05)
+  #index_aicc <- which(eval_4[, "AICc"] < AICc_15)
+  #eval_5 <- eval_4[index_aicc, ]
   
-  proc_proy <- eval_5[, "pRoc_proy"]
+  proc_proy <- eval_4[, "pRoc_proy"]
   index_proc_proy <- which(proc_proy > 1)
-  eval_6 <- eval_5[index_proc_proy, ] 
+  eval_5 <- eval_4[index_proc_proy, ] 
   
-  p_proc_proy <- eval_6[, "p_valor_proy"]
+  p_proc_proy <- eval_5[, "p_valor_proy"]
   index_p_proc_proy <- which(p_proc_proy <= 0.05)
-  eval_7 <- eval_6[index_p_proc_proy, ]
+  eval_6 <- eval_5[index_p_proc_proy, ]
   
-  OR_proy <- eval_7[, "TTP_OR_proy"]
+  OR_proy <- eval_6[, "TTP_OR_proy"]
   index_OR_proy <- which(OR_proy <= 0.10)
-  eval_8 <- eval_7[index_OR_proy, ]
+  eval_7 <- eval_6[index_OR_proy, ]
   
-  pbin_OR_proy <- 1-(eval_8[, "TTP_bin_proy"])
+  pbin_OR_proy <- 1-(eval_7[, "TTP_bin_proy"])
   index_pbin_OR_proy <- which(pbin_OR_proy <= 0.05)
-  eval_9 <- eval_8[index_pbin_OR_proy, ]
+  eval_8 <- eval_7[index_pbin_OR_proy, ]
   
-  index_best <- which(min(eval_9[, "TTP_area_proy"])== eval_9[, "TTP_area_proy"])
-  best <- eval_9[index_best, ][1, ]
+  index_best <- which(min(eval_8[, "TTP_area_proy"])== eval_8[, "TTP_area_proy"])
+  best <- eval_8[index_best, ][1,]
   
   return(best)
 }

@@ -67,11 +67,7 @@ for (i in 1:length(spp)) {
   )
 }
 
-# elegir el mejor modelo, a criterio del investigador
-#             cal     proy
-# rocparcial  NULL     0.3
-# AICc        0.3     NULL   
-# OR_         NULL     0.4
+# elegir el mejor modelo, a criterio del investigador (ver escrito)
 
 selection_ <- rep(list(1), length(spp))
 for (i in 1:length(spp)) {
