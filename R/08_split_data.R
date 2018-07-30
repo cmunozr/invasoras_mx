@@ -12,6 +12,7 @@
 library(rlist)
 library(ENMeval)
 library(rowr)
+library(data.table)
 
 source("R/08_f1_split.data.R")
 source("R/08_f2_envSample.R")
@@ -28,7 +29,7 @@ dir_regclean <- list.files("output/05_occ/",
 # directorio donde se encuentran las variables ambientales por especie
 # transformadas en componentes
 
-dir_envM <- list.dirs("output/07_vars_env_pca", recursive = F) 
+dir_envM <- list.dirs("output/07_env_vars", recursive = F) 
 
 # Generar una tabla de datos con los directorios de datos de presencia
 # completos y de capas ambientales transformadas con el PCA
@@ -51,23 +52,40 @@ gc()
 
 ## resumen
 
-test_1 <- list.files("cleaned_data/occ_data/",
-  pattern = "*test_1.csv",
-  full.names = T
-)
-test_1 <- lapply(test_1, function(x) read.csv(x))
+spp <- read.csv("output/02_sel_spp_inv.csv")
+spp <- sort(as.character(spp$sp))
 
-train <- list.files("cleaned_data/occ_data/",
-  pattern = "*occ_train.csv",
-  full.names = T
-)
-train <- lapply(train, function(x) read.csv(x))
+dirs <- list.dirs("output/08_datasplit/", full.names = T, recursive = F)
+test_1 <- unlist(lapply(dirs, function(x) list.files(path = x, pattern = "test", full.names = T, recursive = F)))
 
+ndata_test <- rep(1, length(spp))
+for(i in 1:length(spp)){
+data <- test_1[grep(spp[i], test_1)]
+data2 <- lapply(data, function(x) read.csv(x))
+data3 <- unlist(lapply(data2, function(x) nrow(x)))
+data3 <- mean(data3) 
+ndata_test[i] <- data3
+}
 
+train_1 <- unlist(lapply(dirs, function(x) list.files(path = x, pattern = "train.csv$", full.names = T, recursive = F)))
 
-mex <- lapply(reg_clean, function(x) nrow(x[x$country == "Mexico", ]))
-mex <- list.rbind(mex)
-no_mex <- lapply(reg_clean, function(x) nrow(x[!x$country == "Mexico", ]))
-no_mex <- list.rbind(no_mex)
-test_2a <- lapply(test_2, function(x) nrow(x)) %>% list.rbind()
-traina <- lapply(train, function(x) nrow(x)) %>% list.rbind()
+ndata_train_1 <- rep(1, length(spp))
+for(i in 1:length(spp)){
+  data <- train_1[grep(spp[i], train_1)]
+  data2 <- lapply(data, function(x) read.csv(x))
+  data3 <- unlist(lapply(data2, function(x) nrow(x[x[,"bin"] == 1,])))
+  data3 <- round(mean(data3), digits = 0) 
+  ndata_train_1[i] <- data3
+}
+
+ndata_train_2 <- rep(1, length(spp))
+for(i in 1:length(spp)){
+  data <- train_1[grep(spp[i], train_1)]
+  data2 <- lapply(data, function(x) read.csv(x))
+  data3 <- unlist(lapply(data2, function(x) nrow(x[x[,"bin"] == 2,])))
+  data3 <- round(mean(data3), digits = 0) 
+  ndata_train_2[i] <- data3
+}
+
+resumen <- data.frame(ndata_test, ndata_train_1, ndata_train_2)
+write.csv(resumen, "output/08_summary.csv", row.names = F)

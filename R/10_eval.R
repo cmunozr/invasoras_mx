@@ -74,12 +74,12 @@ for (i in 1:length(spp)) {
   selection_[[i]] <- selection(
     sp = spp[i],
     path.eval = "output/10_eval_all/",
-    pattern.type = "_climhum.csv"
+    pattern.type = "_clim.csv"
   )
 }
 selection_ <- rbindlist(selection_)
 selection_ <- na.omit(selection_)
-write.csv(selection_, "output/10_modsel_climhum.csv", row.names = F)
+write.csv(selection_, "output/10_modsel_clim.csv", row.names = F)
 
 #Buscar el mejor climatico que se le agrega la hfp
 
@@ -94,7 +94,6 @@ for (i in 1:length(spp)) {
 }
 search_ <- rbindlist(search_, fill = T)
 write.csv(search_, "output/10_modsel_clim_plushum.csv", row.names = F)
-
 
 # hacer analisis mess para todos los modelos
 folder_occ <- list.dirs("output/08_datasplit/",

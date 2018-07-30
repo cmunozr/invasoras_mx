@@ -170,10 +170,13 @@ rm(list=ls())
 # y sp_occ_snib les hace falta aquella columna 'prov'
 
 sp_occ_gbif <- read.csv("output/03_sp_occ_gbif.csv")
+sp_occ_gbif$origen <- rep("gbif", nrow(sp_occ_gbif))
 sp_occ_spocc <- read.csv("output/03_sp_occ_spocc.csv")[,c("name", "longitude", "latitude", "country")]
+sp_occ_spocc$origen <- rep("spocc", nrow(sp_occ_spocc))
 sp_occ_snib <- read.csv("output/03_sp_occ_snib.csv")
+sp_occ_snib$origen <- rep("snib", nrow(sp_occ_snib))
 
-tit <- c("sp", "longitude", "latitude", "country")
+tit <- c("sp", "longitude", "latitude", "country","origen")
 names(sp_occ_gbif) <- tit
 names(sp_occ_spocc) <- tit
 names(sp_occ_snib) <- tit

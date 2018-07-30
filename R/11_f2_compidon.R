@@ -188,12 +188,12 @@ comp_idon <- function(path.a = clim,
     f <- which(as.character(dat.summary$V2) == as.character(index))
     summ_extract <- dat.summary[f, ]
     # pooled mean
-    denominator <- sum(na.omit((summ_extract$n - 1) * summ_extract$mean))
+    denominator <- sum(na.omit(summ_extract$n * summ_extract$mean))
     numerator <- sum(summ_extract$n)
     mean_pooled <- denominator / numerator
     # pooled variance
     denominator <- sum(na.omit((summ_extract$n - 1) * summ_extract$var))
-    numerator <- sum(summ_extract$n)
+    numerator <- sum(summ_extract$n) - length(summ_extract$numsp_)
     var_pooled <- denominator / numerator
     sd_pooled <- sqrt(var_pooled)
     std_error <- sd_pooled / sqrt(numerator)

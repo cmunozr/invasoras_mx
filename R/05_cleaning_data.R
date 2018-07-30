@@ -123,8 +123,10 @@ for (i in 1:length(dat_dup)) {
 
 # Tabla de resumen limpieza -------------------------------------------
 
-
+Mex <- lapply (sp_occ_list, function (x) nrow(x[x[,"country"] == "Mexico",]))%>% list.rbind()
+Nomex <- lapply (sp_occ_list, function (x) nrow(x[x[,"country"] != "Mexico",]))%>% list.rbind() 
 registros <- lapply(sp_occ_list, function(x) nrow(x)) %>% list.rbind()
+
 imp <- lapply(dat_imp, function(x) nrow(x)) %>% list.rbind()
 zeros <- lapply(dat_zeros, function(x) nrow(x)) %>% list.rbind()
 impre <- lapply(dat_impre, function(x) nrow(x)) %>% list.rbind()
@@ -134,11 +136,11 @@ out_env <- lapply(dat_env_out, function(x) nrow(x)) %>% list.rbind()
 unic <- lapply(dat_dup, function(x) nrow(x)) %>% list.rbind()
 
 inf_clean <- data.frame(cbind(
-  registros, imp, zeros, impre, mar, cent,
+  registros, Mex, Nomex, imp, zeros, impre, mar, cent,
   out_env, unic
 ))
 names(inf_clean) <- c(
-  "Registros", "Improbables", "Ceros", "Imprecisos", "Oceano",
+  "Registros", "Mex", "Nomex", "Improbables", "Ceros", "Imprecisos", "Oceano",
   "Centroide", "Atipicos", "Unicos"
 )
 
@@ -146,3 +148,7 @@ write.csv(inf_clean, "output/05_data_clean.csv", row.names = T)
 
 rm(list = ls())
 gc()
+
+a <- read.csv("output/05_data_clean.csv")
+
+summary(a$Unicos)

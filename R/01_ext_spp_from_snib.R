@@ -51,6 +51,7 @@ over_reg_anp <- cbind(registros, over_reg_anp)
 
 over_reg_anp <- na.omit(over_reg_anp)
 
+
 # Dado que las especies catalogadas como introducidas pueden estar
 # tambien en UMAS, es necesario retirarlas en caso de que esten presentes
 # en la base de datosverificar que no existan introducidos en umas
@@ -58,6 +59,8 @@ over_reg_anp <- na.omit(over_reg_anp)
 which(over_reg_anp$Estatus == "Introducida en UMAS") 
 
 write.csv(over_reg_anp, "output/01_over_reg_anp.csv", row.names = FALSE)
+
+over_reg_anp <- over_reg_anp[over_reg_anp$Reino=="Plantae", ]
 
 # Descripción de los datos encontrados de spp introducidas en ANP
 # reinos presentes y numero de especies
@@ -100,7 +103,7 @@ regx_sp[regx_sp == ""] <- NA
 regx_sp <- na.omit(regx_sp)
 
 # numero de anps en los que esta presente cada sp
-x_sp_anp <- data.frame(table(over_reg_anp$sp, over_reg_anp$over_reg_anp))
+x_sp_anp <- data.frame(table(over_reg_anp$sp, over_reg_anp$NOMBRE))
 x_sp_anp[x_sp_anp == "0"] <- NA
 x_sp_anp[x_sp_anp == ""] <- NA
 x_sp_anp <- na.omit(x_sp_anp)
@@ -112,7 +115,7 @@ x_sp_anp[x_sp_anp == ""] <- NA
 x_sp_anp <- na.omit(x_sp_anp)
 
 # numero de sp por anp
-x_anp_sp <- data.frame(table(over_reg_anp$over_reg_anp, over_reg_anp$sp))
+x_anp_sp <- data.frame(table(over_reg_anp$NOMBRE, over_reg_anp$sp))
 x_anp_sp [x_anp_sp == "0"] <- NA
 x_anp_sp [x_anp_sp == ""] <- NA
 x_anp_sp <- na.omit(x_anp_sp)
